@@ -29,13 +29,19 @@ import '/flutter_flow/flutter_flow_animations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 /// Manages the play/pause state of the audio wave animation.
+/// This class provides a simple state management solution for controlling
+/// the audio wave visualization animation using the ChangeNotifier pattern.
 class AudioWaveData extends ChangeNotifier {
   bool _isPlaying;
 
+  /// Creates an AudioWaveData instance with initial play state set to false.
   AudioWaveData() : _isPlaying = false;
 
+  /// Returns the current play state of the audio wave animation.
   bool get isPlaying => _isPlaying;
 
+  /// Starts the audio wave animation if it's currently paused.
+  /// Updates listeners when the state changes.
   void play() {
     if (!_isPlaying) {
       _isPlaying = true;
@@ -43,6 +49,8 @@ class AudioWaveData extends ChangeNotifier {
     }
   }
 
+  /// Pauses the audio wave animation if it's currently playing.
+  /// Updates listeners when the state changes.
   void pause() {
     if (_isPlaying) {
       _isPlaying = false;
@@ -50,6 +58,8 @@ class AudioWaveData extends ChangeNotifier {
     }
   }
 
+  /// Toggles the audio wave animation between play and pause states.
+  /// Updates listeners when the state changes.
   void togglePlayPause() {
     _isPlaying = !_isPlaying;
     notifyListeners();
@@ -76,16 +86,19 @@ class _AudioWaveVisualizerState extends State<AudioWaveVisualizer>
   void initState() {
     super.initState();
 
+    // Initialize the animation controller with a 2-second duration
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
     );
 
+    // Create a curved animation using linear curve
     _waveAnimation = CurvedAnimation(
       parent: _animationController,
       curve: Curves.linear,
     );
 
+    // Update animation state after the first frame is rendered
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _updateAnimationState(
         Provider.of<AudioWaveData>(context, listen: false).isPlaying,
@@ -117,17 +130,29 @@ class _AudioWaveVisualizerState extends State<AudioWaveVisualizer>
   }
 
   /// Calculates the height for a bar based on animation value and index.
+  /// 
+  /// This method creates a wave-like motion by using sine calculations
+  /// with different phases for each bar to produce an animated wave effect.
+  /// 
+  /// Parameters:
+  /// - [animationValue]: Current value of the animation (0.0-1.0)
+  /// - [barIndex]: Index of the bar to calculate height for
+  /// 
+  /// Returns:
+  /// - A double value representing the calculated height for the bar
   double _calculateBarHeight(double animationValue, int barIndex) {
-    // Continuous wave motion
-    final double waveSpeed = 4 * pi;
-    const double phaseSpacing = pi / 3;
+    // Continuous wave motion parameters
+    final double waveSpeed = 4 * pi;       // Speed of wave propagation
+    const double phaseSpacing = pi / 3;    // Phase difference between bars
 
+    // Calculate the angle for the sine wave at this point
     final double angle =
         (animationValue * waveSpeed) - (barIndex * phaseSpacing);
 
-    // Map sine (-1..1) to (0..1)
+    // Map sine values from (-1..1) to (0..1) range and scale amplitude
     final scaledAmplitude = _maxAmplitude * (sin(angle) * 1 + 1);
 
+    // Return base height plus the calculated amplitude
     return _baseHeight + scaledAmplitude;
   }
 
@@ -136,6 +161,7 @@ class _AudioWaveVisualizerState extends State<AudioWaveVisualizer>
     return AnimatedBuilder(
       animation: _waveAnimation,
       builder: (context, child) {
+        // Generate 3 animated bars with calculated heights based on animation value
         return Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -181,6 +207,8 @@ class AudioWaveBar extends StatelessWidget {
 }
 
 /// Custom widget for animated buttons with bounce effect and haptic feedback
+/// This widget provides a button with scaling animations and haptic feedback
+/// for both tap and long press interactions.
 class AnimatedControlButton extends StatefulWidget {
   final IconData icon;
   final VoidCallback onTap;
@@ -211,9 +239,11 @@ class _AnimatedControlButtonState extends State<AnimatedControlButton>
   void initState() {
     super.initState();
 
+    // Initialize the bounce animation controller with 200ms duration
     _bounceController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 200));
 
+    // Create a tween sequence for the bounce effect (scale down then back up)
     _bounceAnimation = TweenSequence([
       TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.85), weight: 50),
       TweenSequenceItem(tween: Tween(begin: 0.85, end: 1.0), weight: 50),
@@ -231,10 +261,16 @@ class _AnimatedControlButtonState extends State<AnimatedControlButton>
     super.dispose();
   }
 
+  /// Handles the tap gesture for the button
+  /// Triggers the bounce animation, haptic feedback, and executes the onTap callback
+  /// Only processes the tap if a long press is not currently active
   void _onTap() {
     if (!_isLongPressing) {
+      // Trigger the bounce animation from the beginning
       _bounceController.forward(from: 0);
+      // Provide haptic feedback to the user
       HapticFeedback.lightImpact();
+      // Execute the callback function passed to the widget
       widget.onTap();
     }
   }
@@ -5246,6 +5282,19 @@ class _VideoPlayerState extends State<VideoPlayer> {
     }
   }
 
+  /// Plays the next episode in the series or movie sequence
+  /// 
+  /// This method handles:
+  /// - Advancing to the next episode in the current season if available
+  /// - Advancing to the next season if all episodes in current season are played
+  /// - Going back to previous screen if no more episodes are available
+  /// - Canceling ad timers when transitioning between episodes
+  /// - Re-initializing the player with the new episode
+  /// 
+  /// The method follows this logic:
+  /// 1. If there's a next episode in the current season, play it
+  /// 2. If there's a next season and we're at the end of current season, switch to next season
+  /// 3. If no more episodes or seasons, handle back button action (return to previous screen)
   Future<void> _playNextEpisode() async {
     if (_currentEpisodeIndex < _currentEpisodes.length - 1) {
       setState(() {
@@ -5426,6 +5475,20 @@ class _VideoPlayerState extends State<VideoPlayer> {
     }
   }
 
+  /// Fetches cinema data from the API for the given movie ID
+  /// 
+  /// This method handles:
+  /// - Setting loading states in the UI
+  /// - Making an HTTP request to fetch cinema data with retry logic
+  /// - Parsing the JSON response into a CinemaDataResponse object
+  /// - Updating the current episodes list
+  /// - Initializing the player if episodes are available
+  /// - Error handling for network issues or invalid responses
+  /// 
+  /// Parameters:
+  /// - Makes a POST request to https://api.rebamovie.com/cinemaData
+  /// - Includes MovieId, userId, and deviceType in the request body
+  /// - Uses retry mechanism with 4 attempts and 1 second delay
   Future<void> _fetchCinemaData() async {
     setState(() {
       _isDataLoading = true;
@@ -5532,6 +5595,17 @@ class _VideoPlayerState extends State<VideoPlayer> {
     }
   }
 
+  /// Initializes the video player with the current episode
+  /// 
+  /// This method handles:
+  /// - Setting up loading states and UI indicators
+  /// - Loading episodes from continue watching data if available
+  /// - Creating and initializing the video player controller
+  /// - Setting up the Chewie player UI
+  /// - Managing resume positions from previous viewing sessions
+  /// 
+  /// It properly disposes of existing controllers before creating new ones
+  /// and handles error states appropriately.
   Future<void> _initializePlayer() async {
     if (_currentEpisodes.isEmpty) return;
 
