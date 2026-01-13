@@ -29,19 +29,13 @@ import '/flutter_flow/flutter_flow_animations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 /// Manages the play/pause state of the audio wave animation.
-/// This class provides a simple state management solution for controlling
-/// the audio wave visualization animation using the ChangeNotifier pattern.
 class AudioWaveData extends ChangeNotifier {
   bool _isPlaying;
 
-  /// Creates an AudioWaveData instance with initial play state set to false.
   AudioWaveData() : _isPlaying = false;
 
-  /// Returns the current play state of the audio wave animation.
   bool get isPlaying => _isPlaying;
 
-  /// Starts the audio wave animation if it's currently paused.
-  /// Updates listeners when the state changes.
   void play() {
     if (!_isPlaying) {
       _isPlaying = true;
@@ -49,8 +43,6 @@ class AudioWaveData extends ChangeNotifier {
     }
   }
 
-  /// Pauses the audio wave animation if it's currently playing.
-  /// Updates listeners when the state changes.
   void pause() {
     if (_isPlaying) {
       _isPlaying = false;
@@ -58,8 +50,6 @@ class AudioWaveData extends ChangeNotifier {
     }
   }
 
-  /// Toggles the audio wave animation between play and pause states.
-  /// Updates listeners when the state changes.
   void togglePlayPause() {
     _isPlaying = !_isPlaying;
     notifyListeners();
@@ -86,19 +76,16 @@ class _AudioWaveVisualizerState extends State<AudioWaveVisualizer>
   void initState() {
     super.initState();
 
-    // Initialize the animation controller with a 2-second duration
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
     );
 
-    // Create a curved animation using linear curve
     _waveAnimation = CurvedAnimation(
       parent: _animationController,
       curve: Curves.linear,
     );
 
-    // Update animation state after the first frame is rendered
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _updateAnimationState(
         Provider.of<AudioWaveData>(context, listen: false).isPlaying,
@@ -130,29 +117,17 @@ class _AudioWaveVisualizerState extends State<AudioWaveVisualizer>
   }
 
   /// Calculates the height for a bar based on animation value and index.
-  /// 
-  /// This method creates a wave-like motion by using sine calculations
-  /// with different phases for each bar to produce an animated wave effect.
-  /// 
-  /// Parameters:
-  /// - [animationValue]: Current value of the animation (0.0-1.0)
-  /// - [barIndex]: Index of the bar to calculate height for
-  /// 
-  /// Returns:
-  /// - A double value representing the calculated height for the bar
   double _calculateBarHeight(double animationValue, int barIndex) {
-    // Continuous wave motion parameters
-    final double waveSpeed = 4 * pi;       // Speed of wave propagation
-    const double phaseSpacing = pi / 3;    // Phase difference between bars
+    // Continuous wave motion
+    final double waveSpeed = 4 * pi;
+    const double phaseSpacing = pi / 3;
 
-    // Calculate the angle for the sine wave at this point
     final double angle =
         (animationValue * waveSpeed) - (barIndex * phaseSpacing);
 
-    // Map sine values from (-1..1) to (0..1) range and scale amplitude
+    // Map sine (-1..1) to (0..1)
     final scaledAmplitude = _maxAmplitude * (sin(angle) * 1 + 1);
 
-    // Return base height plus the calculated amplitude
     return _baseHeight + scaledAmplitude;
   }
 
@@ -161,7 +136,6 @@ class _AudioWaveVisualizerState extends State<AudioWaveVisualizer>
     return AnimatedBuilder(
       animation: _waveAnimation,
       builder: (context, child) {
-        // Generate 3 animated bars with calculated heights based on animation value
         return Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -182,10 +156,7 @@ class _AudioWaveVisualizerState extends State<AudioWaveVisualizer>
 class AudioWaveBar extends StatelessWidget {
   final double height;
 
-  const AudioWaveBar({
-    super.key,
-    required this.height,
-  });
+  const AudioWaveBar({super.key, required this.height});
 
   @override
   Widget build(BuildContext context) {
@@ -207,8 +178,6 @@ class AudioWaveBar extends StatelessWidget {
 }
 
 /// Custom widget for animated buttons with bounce effect and haptic feedback
-/// This widget provides a button with scaling animations and haptic feedback
-/// for both tap and long press interactions.
 class AnimatedControlButton extends StatefulWidget {
   final IconData icon;
   final VoidCallback onTap;
@@ -239,11 +208,11 @@ class _AnimatedControlButtonState extends State<AnimatedControlButton>
   void initState() {
     super.initState();
 
-    // Initialize the bounce animation controller with 200ms duration
     _bounceController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 200));
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
 
-    // Create a tween sequence for the bounce effect (scale down then back up)
     _bounceAnimation = TweenSequence([
       TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.85), weight: 50),
       TweenSequenceItem(tween: Tween(begin: 0.85, end: 1.0), weight: 50),
@@ -261,16 +230,10 @@ class _AnimatedControlButtonState extends State<AnimatedControlButton>
     super.dispose();
   }
 
-  /// Handles the tap gesture for the button
-  /// Triggers the bounce animation, haptic feedback, and executes the onTap callback
-  /// Only processes the tap if a long press is not currently active
   void _onTap() {
     if (!_isLongPressing) {
-      // Trigger the bounce animation from the beginning
       _bounceController.forward(from: 0);
-      // Provide haptic feedback to the user
       HapticFeedback.lightImpact();
-      // Execute the callback function passed to the widget
       widget.onTap();
     }
   }
@@ -315,20 +278,14 @@ class _AnimatedControlButtonState extends State<AnimatedControlButton>
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: BackdropFilter(
-            filter: ImageFilter.blur(
-              sigmaX: 4,
-              sigmaY: 4,
-            ),
+            filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
             child: Container(
               width: widget.size,
               height: widget.size,
               decoration: BoxDecoration(
                 color: Color(0x32818181),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: Color(0x40E0E3E7),
-                  width: 1,
-                ),
+                border: Border.all(color: Color(0x40E0E3E7), width: 1),
               ),
               alignment: AlignmentDirectional(0, 0),
               child: Icon(
@@ -380,7 +337,9 @@ class _AnimatedEpisodeCardState extends State<AnimatedEpisodeCard>
     super.initState();
 
     _bounceController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 200));
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
 
     _bounceAnimation = TweenSequence([
       TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.85), weight: 50),
@@ -407,11 +366,7 @@ class _AnimatedEpisodeCardState extends State<AnimatedEpisodeCard>
         color: Colors.grey[800],
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Icon(
-        Icons.movie,
-        color: Colors.grey[600],
-        size: 40,
-      ),
+      child: Icon(Icons.movie, color: Colors.grey[600], size: 40),
     );
   }
 
@@ -484,21 +439,24 @@ class _AnimatedEpisodeCardState extends State<AnimatedEpisodeCard>
                     color: FlutterFlowTheme.of(context).primary,
                     width: 3,
                   )
-                : null,
+                : Border.all(
+                    color: Colors.white.withOpacity(0.3),
+                    width: 1,
+                  ),
             boxShadow: _isLongPressing
                 ? [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.3),
                       blurRadius: 10,
                       offset: const Offset(0, 5),
-                    )
+                    ),
                   ]
                 : [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.2),
                       blurRadius: 5,
                       offset: const Offset(0, 2),
-                    )
+                    ),
                   ],
           ),
           child: Stack(
@@ -529,10 +487,7 @@ class _AnimatedEpisodeCardState extends State<AnimatedEpisodeCard>
                   gradient: LinearGradient(
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
-                    colors: [
-                      Colors.black.withOpacity(0.9),
-                      Colors.transparent,
-                    ],
+                    colors: [Colors.black.withOpacity(0.9), Colors.transparent],
                     stops: [0.0, 0.9],
                   ),
                   borderRadius: BorderRadius.circular(8),
@@ -544,19 +499,15 @@ class _AnimatedEpisodeCardState extends State<AnimatedEpisodeCard>
                 Align(
                   alignment: AlignmentDirectional(1, -1),
                   child: Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0, 8, 8, 0),
+                    padding: EdgeInsetsDirectional.fromSTEB(0, 5, 5, 0),
                     child: Container(
-                      width: 30,
-                      height: 30,
+                      width: 40,
+                      height: 40,
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.7),
+                        color: Colors.black.withOpacity(0),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(
-                        Icons.lock,
-                        color: Colors.white,
-                        size: 18,
-                      ),
+                      child: Icon(Icons.lock, color: Colors.white, size: 25),
                     ),
                   ),
                 ),
@@ -572,14 +523,16 @@ class _AnimatedEpisodeCardState extends State<AnimatedEpisodeCard>
                     Text(
                       'Season ${widget.seasonIndex + 1}',
                       style: FlutterFlowTheme.of(context).bodySmall.override(
-                            fontFamily:
-                                FlutterFlowTheme.of(context).bodySmallFamily,
+                            fontFamily: FlutterFlowTheme.of(
+                              context,
+                            ).bodySmallFamily,
                             color: Colors.white.withOpacity(0.8),
                             fontSize: 12,
                             letterSpacing: 0.0,
                             fontWeight: FontWeight.w500,
-                            useGoogleFonts:
-                                !FlutterFlowTheme.of(context).bodySmallIsCustom,
+                            useGoogleFonts: !FlutterFlowTheme.of(
+                              context,
+                            ).bodySmallIsCustom,
                           ),
                     ),
 
@@ -588,14 +541,16 @@ class _AnimatedEpisodeCardState extends State<AnimatedEpisodeCard>
                       '${widget.episode.episode}',
                       style:
                           FlutterFlowTheme.of(context).displayMedium.override(
-                                fontFamily: FlutterFlowTheme.of(context)
-                                    .displayMediumFamily,
+                                fontFamily: FlutterFlowTheme.of(
+                                  context,
+                                ).displayMediumFamily,
                                 color: Colors.white,
-                                fontSize: 24,
+                                fontSize: 30,
                                 letterSpacing: 0.0,
                                 fontWeight: FontWeight.bold,
-                                useGoogleFonts: !FlutterFlowTheme.of(context)
-                                    .displayMediumIsCustom,
+                                useGoogleFonts: !FlutterFlowTheme.of(
+                                  context,
+                                ).displayMediumIsCustom,
                               ),
                     ),
 
@@ -604,12 +559,14 @@ class _AnimatedEpisodeCardState extends State<AnimatedEpisodeCard>
                       widget.episode.title ??
                           'Episode ${widget.episode.episode}',
                       style: FlutterFlowTheme.of(context).bodyMedium.override(
-                            fontFamily:
-                                FlutterFlowTheme.of(context).bodyMediumFamily,
+                            fontFamily: FlutterFlowTheme.of(
+                              context,
+                            ).bodyMediumFamily,
                             color: Colors.white,
                             letterSpacing: 0.0,
-                            useGoogleFonts: !FlutterFlowTheme.of(context)
-                                .bodyMediumIsCustom,
+                            useGoogleFonts: !FlutterFlowTheme.of(
+                              context,
+                            ).bodyMediumIsCustom,
                           ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -670,7 +627,9 @@ class _AnimatedMoreVideosCardState extends State<AnimatedMoreVideosCard>
     super.initState();
 
     _bounceController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 200));
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
 
     _bounceAnimation = TweenSequence([
       TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.9), weight: 50),
@@ -752,7 +711,7 @@ class _AnimatedMoreVideosCardState extends State<AnimatedMoreVideosCard>
                       color: Colors.black.withOpacity(0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 3),
-                    )
+                    ),
                   ]
                 : null,
           ),
@@ -772,29 +731,33 @@ class _AnimatedMoreVideosCardState extends State<AnimatedMoreVideosCard>
                         widget.moreText,
                         style:
                             FlutterFlowTheme.of(context).displaySmall.override(
-                                  fontFamily: FlutterFlowTheme.of(context)
-                                      .displaySmallFamily,
+                                  fontFamily: FlutterFlowTheme.of(
+                                    context,
+                                  ).displaySmallFamily,
                                   color: Colors.white,
                                   fontSize: 15,
                                   letterSpacing: 0.0,
                                   fontWeight: FontWeight.normal,
                                   lineHeight: 1,
-                                  useGoogleFonts: !FlutterFlowTheme.of(context)
-                                      .displaySmallIsCustom,
+                                  useGoogleFonts: !FlutterFlowTheme.of(
+                                    context,
+                                  ).displaySmallIsCustom,
                                 ),
                       ),
                       Text(
                         widget.videoText,
                         style:
                             FlutterFlowTheme.of(context).displaySmall.override(
-                                  fontFamily: FlutterFlowTheme.of(context)
-                                      .displaySmallFamily,
+                                  fontFamily: FlutterFlowTheme.of(
+                                    context,
+                                  ).displaySmallFamily,
                                   color: FlutterFlowTheme.of(context).primary,
                                   fontSize: 15,
                                   letterSpacing: 0.0,
                                   fontWeight: FontWeight.normal,
-                                  useGoogleFonts: !FlutterFlowTheme.of(context)
-                                      .displaySmallIsCustom,
+                                  useGoogleFonts: !FlutterFlowTheme.of(
+                                    context,
+                                  ).displaySmallIsCustom,
                                 ),
                       ),
                     ],
@@ -869,10 +832,7 @@ class CinemaData {
   final List<String> seasons;
   final List<List<ApiEpisodeData>> episodes;
 
-  CinemaData({
-    required this.seasons,
-    required this.episodes,
-  });
+  CinemaData({required this.seasons, required this.episodes});
 
   factory CinemaData.fromJson(Map<String, dynamic> json) {
     List<String> seasonsList = List<String>.from(json['seasons'] ?? []);
@@ -888,10 +848,7 @@ class CinemaData {
       }
     }
 
-    return CinemaData(
-      seasons: seasonsList,
-      episodes: episodesList,
-    );
+    return CinemaData(seasons: seasonsList, episodes: episodesList);
   }
 }
 
@@ -1082,14 +1039,10 @@ class MovieDataId {
 class Interpreter {
   final String title;
 
-  Interpreter({
-    required this.title,
-  });
+  Interpreter({required this.title});
 
   factory Interpreter.fromJson(Map<String, dynamic> json) {
-    return Interpreter(
-      title: json['title'] ?? '',
-    );
+    return Interpreter(title: json['title'] ?? '');
   }
 }
 
@@ -1204,24 +1157,15 @@ class _QualitySelectorState extends State<QualitySelector> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: BackdropFilter(
-        filter: ImageFilter.blur(
-          sigmaX: 4,
-          sigmaY: 4,
-        ),
+        filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
         child: Container(
           width: 230,
           height: 55,
-          constraints: BoxConstraints(
-            minWidth: 200,
-            maxWidth: 270,
-          ),
+          constraints: BoxConstraints(minWidth: 200, maxWidth: 270),
           decoration: BoxDecoration(
             color: Color(0x32818181),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: Color(0x40E0E3E7),
-              width: 1,
-            ),
+            border: Border.all(color: Color(0x40E0E3E7), width: 1),
           ),
           child: Padding(
             padding: EdgeInsets.all(5),
@@ -1262,21 +1206,24 @@ class _QualitySelectorState extends State<QualitySelector> {
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
-                                    fontFamily: FlutterFlowTheme.of(context)
-                                        .bodyMediumFamily,
+                                    fontFamily: FlutterFlowTheme.of(
+                                      context,
+                                    ).bodyMediumFamily,
                                     color: _isQualityAvailable("HD")
                                         ? (widget.currentQuality == "HD"
-                                            ? FlutterFlowTheme.of(context)
-                                                .primaryBackground
-                                            : FlutterFlowTheme.of(context)
-                                                .alternate)
+                                            ? FlutterFlowTheme.of(
+                                                context,
+                                              ).primaryBackground
+                                            : FlutterFlowTheme.of(
+                                                context,
+                                              ).alternate)
                                         : Color(0x41B4B8B4),
                                     fontSize: 15,
                                     letterSpacing: 0.0,
                                     fontWeight: FontWeight.w600,
-                                    useGoogleFonts:
-                                        !FlutterFlowTheme.of(context)
-                                            .bodyMediumIsCustom,
+                                    useGoogleFonts: !FlutterFlowTheme.of(
+                                      context,
+                                    ).bodyMediumIsCustom,
                                   ),
                             ),
                           ),
@@ -1287,21 +1234,24 @@ class _QualitySelectorState extends State<QualitySelector> {
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
-                                    fontFamily: FlutterFlowTheme.of(context)
-                                        .bodyMediumFamily,
+                                    fontFamily: FlutterFlowTheme.of(
+                                      context,
+                                    ).bodyMediumFamily,
                                     color: _isQualityAvailable("HD")
                                         ? (widget.currentQuality == "HD"
-                                            ? FlutterFlowTheme.of(context)
-                                                .primaryBackground
-                                            : FlutterFlowTheme.of(context)
-                                                .alternate)
+                                            ? FlutterFlowTheme.of(
+                                                context,
+                                              ).primaryBackground
+                                            : FlutterFlowTheme.of(
+                                                context,
+                                              ).alternate)
                                         : Color(0x41B4B8B4),
                                     fontSize: 12,
                                     letterSpacing: 0.0,
                                     fontWeight: FontWeight.w300,
-                                    useGoogleFonts:
-                                        !FlutterFlowTheme.of(context)
-                                            .bodyMediumIsCustom,
+                                    useGoogleFonts: !FlutterFlowTheme.of(
+                                      context,
+                                    ).bodyMediumIsCustom,
                                   ),
                             ),
                           ],
@@ -1344,21 +1294,24 @@ class _QualitySelectorState extends State<QualitySelector> {
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
-                                    fontFamily: FlutterFlowTheme.of(context)
-                                        .bodyMediumFamily,
+                                    fontFamily: FlutterFlowTheme.of(
+                                      context,
+                                    ).bodyMediumFamily,
                                     color: _isQualityAvailable("MID")
                                         ? (widget.currentQuality == "MID"
-                                            ? FlutterFlowTheme.of(context)
-                                                .primaryBackground
-                                            : FlutterFlowTheme.of(context)
-                                                .alternate)
+                                            ? FlutterFlowTheme.of(
+                                                context,
+                                              ).primaryBackground
+                                            : FlutterFlowTheme.of(
+                                                context,
+                                              ).alternate)
                                         : Color(0x41B4B8B4),
                                     fontSize: 15,
                                     letterSpacing: 0.0,
                                     fontWeight: FontWeight.w600,
-                                    useGoogleFonts:
-                                        !FlutterFlowTheme.of(context)
-                                            .bodyMediumIsCustom,
+                                    useGoogleFonts: !FlutterFlowTheme.of(
+                                      context,
+                                    ).bodyMediumIsCustom,
                                   ),
                             ),
                           ),
@@ -1369,21 +1322,24 @@ class _QualitySelectorState extends State<QualitySelector> {
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
-                                    fontFamily: FlutterFlowTheme.of(context)
-                                        .bodyMediumFamily,
+                                    fontFamily: FlutterFlowTheme.of(
+                                      context,
+                                    ).bodyMediumFamily,
                                     color: _isQualityAvailable("MID")
                                         ? (widget.currentQuality == "MID"
-                                            ? FlutterFlowTheme.of(context)
-                                                .primaryBackground
-                                            : FlutterFlowTheme.of(context)
-                                                .alternate)
+                                            ? FlutterFlowTheme.of(
+                                                context,
+                                              ).primaryBackground
+                                            : FlutterFlowTheme.of(
+                                                context,
+                                              ).alternate)
                                         : Color(0x41B4B8B4),
                                     fontSize: 12,
                                     letterSpacing: 0.0,
                                     fontWeight: FontWeight.w300,
-                                    useGoogleFonts:
-                                        !FlutterFlowTheme.of(context)
-                                            .bodyMediumIsCustom,
+                                    useGoogleFonts: !FlutterFlowTheme.of(
+                                      context,
+                                    ).bodyMediumIsCustom,
                                   ),
                             ),
                           ],
@@ -1426,21 +1382,24 @@ class _QualitySelectorState extends State<QualitySelector> {
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
-                                    fontFamily: FlutterFlowTheme.of(context)
-                                        .bodyMediumFamily,
+                                    fontFamily: FlutterFlowTheme.of(
+                                      context,
+                                    ).bodyMediumFamily,
                                     color: _isQualityAvailable("LOW")
                                         ? (widget.currentQuality == "LOW"
-                                            ? FlutterFlowTheme.of(context)
-                                                .primaryBackground
-                                            : FlutterFlowTheme.of(context)
-                                                .alternate)
+                                            ? FlutterFlowTheme.of(
+                                                context,
+                                              ).primaryBackground
+                                            : FlutterFlowTheme.of(
+                                                context,
+                                              ).alternate)
                                         : Color(0x41B4B8B4),
                                     fontSize: 15,
                                     letterSpacing: 0.0,
                                     fontWeight: FontWeight.w600,
-                                    useGoogleFonts:
-                                        !FlutterFlowTheme.of(context)
-                                            .bodyMediumIsCustom,
+                                    useGoogleFonts: !FlutterFlowTheme.of(
+                                      context,
+                                    ).bodyMediumIsCustom,
                                   ),
                             ),
                           ),
@@ -1451,21 +1410,24 @@ class _QualitySelectorState extends State<QualitySelector> {
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
-                                    fontFamily: FlutterFlowTheme.of(context)
-                                        .bodyMediumFamily,
+                                    fontFamily: FlutterFlowTheme.of(
+                                      context,
+                                    ).bodyMediumFamily,
                                     color: _isQualityAvailable("LOW")
                                         ? (widget.currentQuality == "LOW"
-                                            ? FlutterFlowTheme.of(context)
-                                                .primaryBackground
-                                            : FlutterFlowTheme.of(context)
-                                                .alternate)
+                                            ? FlutterFlowTheme.of(
+                                                context,
+                                              ).primaryBackground
+                                            : FlutterFlowTheme.of(
+                                                context,
+                                              ).alternate)
                                         : Color(0x41B4B8B4),
                                     fontSize: 12,
                                     letterSpacing: 0.0,
                                     fontWeight: FontWeight.w300,
-                                    useGoogleFonts:
-                                        !FlutterFlowTheme.of(context)
-                                            .bodyMediumIsCustom,
+                                    useGoogleFonts: !FlutterFlowTheme.of(
+                                      context,
+                                    ).bodyMediumIsCustom,
                                   ),
                             ),
                           ],
@@ -1660,10 +1622,13 @@ class _AdPlayerState extends State<AdPlayer> {
 
   Future<void> _toggleFullscreen() async {
     if (_isFullScreen) {
-      await SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-          overlays: SystemUiOverlay.values);
-      await SystemChrome.setPreferredOrientations(
-          [DeviceOrientation.portraitUp]);
+      await SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.manual,
+        overlays: SystemUiOverlay.values,
+      );
+      await SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+      ]);
       setState(() {
         _isFullScreen = false;
       });
@@ -1689,10 +1654,7 @@ class _AdPlayerState extends State<AdPlayer> {
           height: 50,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: const Color(0x67FFFFFF),
-              width: 2,
-            ),
+            border: Border.all(color: const Color(0x67FFFFFF), width: 2),
           ),
           child: Stack(
             children: [
@@ -1733,8 +1695,10 @@ class _AdPlayerState extends State<AdPlayer> {
               Center(
                 child: Text(
                   _skipActive
-                      ? "Skip"
-                      : "Wait ${_skipDuration - (_skipProgress * _skipDuration).floor()}s",
+                      ? Localizations.localeOf(context).languageCode == 'en'
+                          ? 'Skip'
+                          : 'Hagarika'
+                      : "${Localizations.localeOf(context).languageCode == 'en' ? 'wait' : 'Tegereza'} ${_skipDuration - (_skipProgress * _skipDuration).floor()}s",
                   style: TextStyle(
                     color: _skipActive
                         ? Colors.white
@@ -1771,14 +1735,16 @@ class _AdPlayerState extends State<AdPlayer> {
               width: double.infinity,
               height: double.infinity,
               color: Colors.black,
-              child: const Center(
+              child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     CircularProgressIndicator(color: Colors.white),
                     SizedBox(height: 16),
                     Text(
-                      'Loading ad...',
+                      Localizations.localeOf(context).languageCode == 'en'
+                          ? 'Loading Advertisement...'
+                          : 'Kwamamaza...',
                       style: TextStyle(color: Colors.white),
                     ),
                   ],
@@ -1815,7 +1781,7 @@ class _AdPlayerState extends State<AdPlayer> {
                             child: Icon(
                               Icons.chevron_left_rounded,
                               color: Colors.white,
-                              size: 30,
+                              size: 25,
                             ),
                           ),
                         ),
@@ -1867,20 +1833,25 @@ class _AdPlayerState extends State<AdPlayer> {
                             child: Align(
                               alignment: AlignmentDirectional(0, 0),
                               child: Text(
-                                'Click To Pay',
+                                Localizations.localeOf(context).languageCode ==
+                                        'en'
+                                    ? 'Click To Pay'
+                                    : 'Kwishyura',
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
-                                      fontFamily: FlutterFlowTheme.of(context)
-                                          .bodyMediumFamily,
-                                      color: FlutterFlowTheme.of(context)
-                                          .primaryBackground,
+                                      fontFamily: FlutterFlowTheme.of(
+                                        context,
+                                      ).bodyMediumFamily,
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).primaryBackground,
                                       fontSize: 15,
                                       letterSpacing: 0.0,
                                       fontWeight: FontWeight.w600,
-                                      useGoogleFonts:
-                                          !FlutterFlowTheme.of(context)
-                                              .bodyMediumIsCustom,
+                                      useGoogleFonts: !FlutterFlowTheme.of(
+                                        context,
+                                      ).bodyMediumIsCustom,
                                     ),
                               ),
                             ),
@@ -1937,7 +1908,9 @@ class _AnimatedSeasonCardState extends State<AnimatedSeasonCard>
     super.initState();
 
     _bounceController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 200));
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
 
     _bounceAnimation = TweenSequence([
       TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.85), weight: 50),
@@ -1990,10 +1963,7 @@ class _AnimatedSeasonCardState extends State<AnimatedSeasonCard>
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: widget.isActive
-                ? Border.all(
-                    color: Color(0xCC1FDF67),
-                    width: 4,
-                  )
+                ? Border.all(color: Color(0xCC1FDF67), width: 4)
                 : null,
           ),
           child: Stack(
@@ -2042,8 +2012,9 @@ class _AnimatedSeasonCardState extends State<AnimatedSeasonCard>
                         fontSize: 30,
                         letterSpacing: 0.0,
                         fontWeight: FontWeight.w600,
-                        useGoogleFonts:
-                            !FlutterFlowTheme.of(context).bodyMediumIsCustom,
+                        useGoogleFonts: !FlutterFlowTheme.of(
+                          context,
+                        ).bodyMediumIsCustom,
                       ),
                 ),
               ),
@@ -2062,11 +2033,7 @@ class _AnimatedSeasonCardState extends State<AnimatedSeasonCard>
         color: Colors.grey[800],
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Icon(
-        Icons.movie,
-        color: Colors.grey[600],
-        size: 40,
-      ),
+      child: Icon(Icons.movie, color: Colors.grey[600], size: 40),
     );
   }
 }
@@ -2075,10 +2042,7 @@ class _VideoLoadingScreen extends StatefulWidget {
   final ApiEpisodeData episode;
   final bool isLandscape;
 
-  const _VideoLoadingScreen({
-    required this.episode,
-    required this.isLandscape,
-  });
+  const _VideoLoadingScreen({required this.episode, required this.isLandscape});
 
   @override
   State<_VideoLoadingScreen> createState() => _VideoLoadingScreenState();
@@ -2270,7 +2234,7 @@ class _VideoLoadingScreenState extends State<_VideoLoadingScreen> {
                 colors: [
                   Color(0xF2090909),
                   Color(0xDD090909),
-                  Color(0x00090909)
+                  Color(0x00090909),
                 ],
                 stops: [0.2, 0.4, 1],
                 begin: AlignmentDirectional(-1, 0),
@@ -2321,9 +2285,9 @@ class _VideoLoadingScreenState extends State<_VideoLoadingScreen> {
                         style: FlutterFlowTheme.of(context).bodyLarge.override(
                               font: GoogleFonts.ptSans(
                                 fontWeight: FontWeight.w200,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .bodyLarge
-                                    .fontStyle,
+                                fontStyle: FlutterFlowTheme.of(
+                                  context,
+                                ).bodyLarge.fontStyle,
                               ),
                               color: Color(0x99C3C1C1),
                               fontSize: 15,
@@ -2384,8 +2348,8 @@ class _VideoLoadingScreenState extends State<_VideoLoadingScreen> {
               fadeOutDuration: Duration(milliseconds: 500),
               imageUrl: widget.episode.longCover.isNotEmpty
                   ? widget.episode.noLongCover == null
-                      ? widget.episode.noLongCover
-                      : widget.episode.longCover
+                      ? widget.episode.noImage
+                      : widget.episode.image
                   : 'https://image.tmdb.org/t/p/original/dLK5snN0BFxPzdbrAqO7B3ilsMh.jpg',
               width: double.infinity,
               height: double.infinity,
@@ -2404,7 +2368,7 @@ class _VideoLoadingScreenState extends State<_VideoLoadingScreen> {
                   colors: [
                     Color(0xF2090909),
                     Color(0xDD090909),
-                    Color(0x00090909)
+                    Color(0x00090909),
                   ],
                   stops: [0.2, 0.4, 1],
                   begin: AlignmentDirectional(0, 1),
@@ -2456,9 +2420,9 @@ class _VideoLoadingScreenState extends State<_VideoLoadingScreen> {
                               FlutterFlowTheme.of(context).bodyLarge.override(
                                     font: GoogleFonts.ptSans(
                                       fontWeight: FontWeight.w200,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyLarge
-                                          .fontStyle,
+                                      fontStyle: FlutterFlowTheme.of(
+                                        context,
+                                      ).bodyLarge.fontStyle,
                                     ),
                                     color: Color(0x99C3C1C1),
                                     fontSize: 15,
@@ -2561,19 +2525,13 @@ class _VideoLoadingScreenState extends State<_VideoLoadingScreen> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: 4,
-            sigmaY: 4,
-          ),
+          filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
           child: Container(
             height: 25,
             decoration: BoxDecoration(
               color: Color(0x34333131),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: Color(0x1BE0E3E7),
-                width: 1,
-              ),
+              border: Border.all(color: Color(0x1BE0E3E7), width: 1),
             ),
             alignment: AlignmentDirectional(0, 0),
             child: Padding(
@@ -2599,8 +2557,9 @@ class _VideoLoadingScreenState extends State<_VideoLoadingScreen> {
                           color: Color(0xB2ECEBEB),
                           fontSize: 13,
                           letterSpacing: 0.0,
-                          useGoogleFonts:
-                              !FlutterFlowTheme.of(context).bodyMediumIsCustom,
+                          useGoogleFonts: !FlutterFlowTheme.of(
+                            context,
+                          ).bodyMediumIsCustom,
                         ),
                   ),
                 ],
@@ -2736,10 +2695,12 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
     _sliderHeightAnimation = Tween<double>(
       begin: _originalSliderHeight,
       end: _expandedSliderHeight,
-    ).animate(CurvedAnimation(
-      parent: _sliderAnimationController,
-      curve: Curves.easeInOut,
-    ));
+    ).animate(
+      CurvedAnimation(
+        parent: _sliderAnimationController,
+        curve: Curves.easeInOut,
+      ),
+    );
   }
 
   @override
@@ -2873,8 +2834,9 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
     _showControlsAndStartTimer();
     final pos = widget.videoController.value.position;
     final target = pos - const Duration(seconds: 30);
-    widget.videoController
-        .seekTo(target > Duration.zero ? target : Duration.zero);
+    widget.videoController.seekTo(
+      target > Duration.zero ? target : Duration.zero,
+    );
   }
 
   Future<void> _onSeekBarChangedStart(double value) async {
@@ -2901,8 +2863,9 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
     await HapticFeedback.lightImpact();
     _sliderAnimationController.reverse();
     final duration = widget.videoController.value.duration;
-    final position =
-        Duration(milliseconds: (duration.inMilliseconds * value).round());
+    final position = Duration(
+      milliseconds: (duration.inMilliseconds * value).round(),
+    );
     widget.videoController.seekTo(position);
 
     if (mounted) {
@@ -2953,11 +2916,7 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
         color: Colors.grey[700],
         borderRadius: BorderRadius.circular(6),
       ),
-      child: Icon(
-        Icons.movie,
-        color: Colors.grey[500],
-        size: 30,
-      ),
+      child: Icon(Icons.movie, color: Colors.grey[500], size: 30),
     );
   }
 
@@ -2986,20 +2945,14 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: 4,
-                sigmaY: 4,
-              ),
+              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
               child: Container(
                 width: 150,
                 height: 40,
                 decoration: BoxDecoration(
                   color: Color(0x32818181),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Color(0x40E0E3E7),
-                    width: 1,
-                  ),
+                  border: Border.all(color: Color(0x40E0E3E7), width: 1),
                 ),
                 child: Padding(
                   padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 0),
@@ -3010,14 +2963,16 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
                       Text(
                         _getSkipIntroText(),
                         style: FlutterFlowTheme.of(context).titleSmall.override(
-                              fontFamily:
-                                  FlutterFlowTheme.of(context).titleSmallFamily,
+                              fontFamily: FlutterFlowTheme.of(
+                                context,
+                              ).titleSmallFamily,
                               color: Colors.white,
                               fontSize: 14,
                               letterSpacing: 0.0,
                               fontWeight: FontWeight.w500,
-                              useGoogleFonts: !FlutterFlowTheme.of(context)
-                                  .titleSmallIsCustom,
+                              useGoogleFonts: !FlutterFlowTheme.of(
+                                context,
+                              ).titleSmallIsCustom,
                             ),
                       ),
                       Icon(
@@ -3048,20 +3003,14 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: BackdropFilter(
-            filter: ImageFilter.blur(
-              sigmaX: 4,
-              sigmaY: 4,
-            ),
+            filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
             child: Container(
               width: 150,
               height: 40,
               decoration: BoxDecoration(
                 color: Color(0x32818181),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: Color(0x40E0E3E7),
-                  width: 1,
-                ),
+                border: Border.all(color: Color(0x40E0E3E7), width: 1),
               ),
               child: Stack(
                 children: [
@@ -3085,7 +3034,7 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
                   ),
                   Center(
                     child: Text(
-                      "Ad in ${widget.adCountdownSeconds}s",
+                      "${Localizations.localeOf(context).languageCode == 'en' ? 'Ad in' : 'Kwamamaza'} ${widget.adCountdownSeconds}s",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 14,
@@ -3127,20 +3076,14 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: 4,
-                sigmaY: 4,
-              ),
+              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
               child: Container(
                 width: 230,
                 height: 50,
                 decoration: BoxDecoration(
                   color: Color(0x32818181),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Color(0x40E0E3E7),
-                    width: 1,
-                  ),
+                  border: Border.all(color: Color(0x40E0E3E7), width: 1),
                 ),
                 child: Padding(
                   padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 0),
@@ -3151,14 +3094,16 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
                       Text(
                         _getSkipIntroText(),
                         style: FlutterFlowTheme.of(context).titleSmall.override(
-                              fontFamily:
-                                  FlutterFlowTheme.of(context).titleSmallFamily,
+                              fontFamily: FlutterFlowTheme.of(
+                                context,
+                              ).titleSmallFamily,
                               color: Colors.white,
                               fontSize: 14,
                               letterSpacing: 0.0,
                               fontWeight: FontWeight.w500,
-                              useGoogleFonts: !FlutterFlowTheme.of(context)
-                                  .titleSmallIsCustom,
+                              useGoogleFonts: !FlutterFlowTheme.of(
+                                context,
+                              ).titleSmallIsCustom,
                             ),
                       ),
                       Icon(
@@ -3189,20 +3134,14 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: BackdropFilter(
-            filter: ImageFilter.blur(
-              sigmaX: 4,
-              sigmaY: 4,
-            ),
+            filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
             child: Container(
               width: 230,
               height: 50,
               decoration: BoxDecoration(
                 color: Color(0x32818181),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: Color(0x40E0E3E7),
-                  width: 1,
-                ),
+                border: Border.all(color: Color(0x40E0E3E7), width: 1),
               ),
               child: Stack(
                 children: [
@@ -3226,7 +3165,7 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
                   ),
                   Center(
                     child: Text(
-                      "Ad in ${widget.adCountdownSeconds}s",
+                      "${Localizations.localeOf(context).languageCode == 'en' ? 'Ad in' : 'Kwamamaza'} ${widget.adCountdownSeconds}s",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 14,
@@ -3244,63 +3183,63 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
   }
 
   Widget _buildLandscapeAdCountdownButton() {
-    return AnimatedOpacity(
-      opacity: widget.showAdCountdown ? 1.0 : 0.0,
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
-      child: AnimatedScale(
-        scale: widget.showAdCountdown ? 1.0 : 0.8,
-        duration: const Duration(milliseconds: 400),
+    return SafeArea(
+      top: false,
+      bottom: false,
+      left: true,
+      right: false,
+      child: AnimatedOpacity(
+        opacity: widget.showAdCountdown ? 1.0 : 0.0,
+        duration: const Duration(milliseconds: 500),
         curve: Curves.easeInOut,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(
-              sigmaX: 4,
-              sigmaY: 4,
-            ),
-            child: Container(
-              width: 200,
-              height: 50,
-              decoration: BoxDecoration(
-                color: Color(0x32818181),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: Color(0x40E0E3E7),
-                  width: 1,
+        child: AnimatedScale(
+          scale: widget.showAdCountdown ? 1.0 : 0.8,
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeInOut,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+              child: Container(
+                width: 200,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: Color(0x32818181),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Color(0x40E0E3E7), width: 1),
                 ),
-              ),
-              child: Stack(
-                children: [
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 100),
-                    width: 200 * (widget.adCountdownSeconds / 10),
-                    height: double.infinity,
-                    decoration: BoxDecoration(
-                      color: const Color(0x34E0E3E7),
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: const Radius.circular(20),
-                        bottomRight: widget.adCountdownSeconds >= 10
-                            ? const Radius.circular(20)
-                            : const Radius.circular(0),
-                        topLeft: const Radius.circular(20),
-                        topRight: widget.adCountdownSeconds >= 10
-                            ? const Radius.circular(20)
-                            : const Radius.circular(0),
+                child: Stack(
+                  children: [
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 100),
+                      width: 200 * (widget.adCountdownSeconds / 10),
+                      height: double.infinity,
+                      decoration: BoxDecoration(
+                        color: const Color(0x34E0E3E7),
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: const Radius.circular(20),
+                          bottomRight: widget.adCountdownSeconds >= 10
+                              ? const Radius.circular(20)
+                              : const Radius.circular(0),
+                          topLeft: const Radius.circular(20),
+                          topRight: widget.adCountdownSeconds >= 10
+                              ? const Radius.circular(20)
+                              : const Radius.circular(0),
+                        ),
                       ),
                     ),
-                  ),
-                  Center(
-                    child: Text(
-                      "Ad in ${widget.adCountdownSeconds}s",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
+                    Center(
+                      child: Text(
+                        "${Localizations.localeOf(context).languageCode == 'en' ? 'Ad in' : 'Kwamamaza'} ${widget.adCountdownSeconds}s",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -3310,70 +3249,73 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
   }
 
   Widget _buildLandscapeSkipIntroButton() {
-    return AnimatedOpacity(
-      opacity: _showSkipIntro ? 1.0 : 0.0,
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
-      onEnd: () {
-        if (!_showSkipIntro) {
-          setState(() {});
-        }
-      },
-      child: AnimatedScale(
-        scale: _showSkipIntro ? 1.0 : 0.8,
-        duration: const Duration(milliseconds: 400),
+    return SafeArea(
+      top: false,
+      bottom: false,
+      left: true,
+      right: false,
+      child: AnimatedOpacity(
+        opacity: _showSkipIntro ? 1.0 : 0.0,
+        duration: const Duration(milliseconds: 500),
         curve: Curves.easeInOut,
-        child: GestureDetector(
-          onTap: _showSkipIntro
-              ? () async {
-                  await HapticFeedback.lightImpact();
-                  _showControlsAndStartTimer();
-                  widget.onSkipIntro();
-                }
-              : null,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: 4,
-                sigmaY: 4,
-              ),
-              child: Container(
-                width: 200,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: Color(0x32818181),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Color(0x40E0E3E7),
-                    width: 1,
+        onEnd: () {
+          if (!_showSkipIntro) {
+            setState(() {});
+          }
+        },
+        child: AnimatedScale(
+          scale: _showSkipIntro ? 1.0 : 0.8,
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeInOut,
+          child: GestureDetector(
+            onTap: _showSkipIntro
+                ? () async {
+                    await HapticFeedback.lightImpact();
+                    _showControlsAndStartTimer();
+                    widget.onSkipIntro();
+                  }
+                : null,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                child: Container(
+                  width: 200,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Color(0x32818181),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Color(0x40E0E3E7), width: 1),
                   ),
-                ),
-                child: Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        _getSkipIntroText(),
-                        style: FlutterFlowTheme.of(context).titleSmall.override(
-                              fontFamily:
-                                  FlutterFlowTheme.of(context).titleSmallFamily,
-                              color: Colors.white,
-                              fontSize: 15,
-                              letterSpacing: 0.0,
-                              fontWeight: FontWeight.w500,
-                              useGoogleFonts: !FlutterFlowTheme.of(context)
-                                  .titleSmallIsCustom,
-                            ),
-                      ),
-                      Icon(
-                        Icons.fast_forward_rounded,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                    ],
+                  child: Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          _getSkipIntroText(),
+                          style:
+                              FlutterFlowTheme.of(context).titleSmall.override(
+                                    fontFamily: FlutterFlowTheme.of(
+                                      context,
+                                    ).titleSmallFamily,
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.w500,
+                                    useGoogleFonts: !FlutterFlowTheme.of(
+                                      context,
+                                    ).titleSmallIsCustom,
+                                  ),
+                        ),
+                        Icon(
+                          Icons.fast_forward_rounded,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -3398,20 +3340,14 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: 4,
-                sigmaY: 4,
-              ),
+              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
               child: Container(
                 width: 230,
                 height: 50,
                 decoration: BoxDecoration(
                   color: Color(0x32818181),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Color(0x40E0E3E7),
-                    width: 1,
-                  ),
+                  border: Border.all(color: Color(0x40E0E3E7), width: 1),
                 ),
                 child: Stack(
                   children: [
@@ -3438,7 +3374,9 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "Next Episode",
+                            Localizations.localeOf(context).languageCode == 'en'
+                                ? 'Next Episode'
+                                : 'Indi Episode',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 14,
@@ -3478,20 +3416,14 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: 4,
-                sigmaY: 4,
-              ),
+              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
               child: Container(
                 width: 200,
                 height: 50,
                 decoration: BoxDecoration(
                   color: Color(0x32818181),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Color(0x40E0E3E7),
-                    width: 1,
-                  ),
+                  border: Border.all(color: Color(0x40E0E3E7), width: 1),
                 ),
                 child: Stack(
                   children: [
@@ -3518,7 +3450,9 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "Next Episode",
+                            Localizations.localeOf(context).languageCode == 'en'
+                                ? 'Next Episode'
+                                : 'Indi Episode',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 15,
@@ -3575,10 +3509,7 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
           gradient: LinearGradient(
             begin: Alignment.bottomCenter,
             end: Alignment.topCenter,
-            colors: [
-              Colors.black.withOpacity(0.9),
-              Colors.transparent,
-            ],
+            colors: [Colors.black.withOpacity(0.9), Colors.transparent],
           ),
         ),
         child: Column(
@@ -3600,24 +3531,25 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
                   decoration: BoxDecoration(
                     color: Color(0xCC1FDF67),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Color(0x67FFFFFF),
-                      width: 1,
-                    ),
+                    border: Border.all(color: Color(0x67FFFFFF), width: 1),
                   ),
                   child: Center(
                     child: Text(
-                      'Click To Pay',
+                      Localizations.localeOf(context).languageCode == 'en'
+                          ? 'Click To Pay'
+                          : 'Kwishyura',
                       style: FlutterFlowTheme.of(context).bodyMedium.override(
-                            fontFamily:
-                                FlutterFlowTheme.of(context).bodyMediumFamily,
+                            fontFamily: FlutterFlowTheme.of(
+                              context,
+                            ).bodyMediumFamily,
                             color:
                                 FlutterFlowTheme.of(context).primaryBackground,
                             fontSize: isFullScreenMode ? 15 : 18,
                             letterSpacing: 0.0,
                             fontWeight: FontWeight.w600,
-                            useGoogleFonts: !FlutterFlowTheme.of(context)
-                                .bodyMediumIsCustom,
+                            useGoogleFonts: !FlutterFlowTheme.of(
+                              context,
+                            ).bodyMediumIsCustom,
                           ),
                     ),
                   ),
@@ -3674,14 +3606,10 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
                       children: [
                         SizedBox(width: isFullScreenMode ? 50 : 20),
                         // Back button
-                        Row(children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: BackdropFilter(
-                              filter: ImageFilter.blur(
-                                sigmaX: 4,
-                                sigmaY: 4,
-                              ),
+                        Row(
+                          children: [
+                            BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
                               child: GestureDetector(
                                 onTap: () async {
                                   await HapticFeedback.lightImpact();
@@ -3698,18 +3626,17 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
                                       width: 1,
                                     ),
                                   ),
-                                  alignment: Alignment.center,
                                   child: Icon(
-                                    Icons.arrow_back_ios,
+                                    Icons.chevron_left_rounded,
                                     color: Colors.white,
-                                    size: 20,
+                                    size: 30,
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                          SizedBox(width: 10),
-                        ]),
+                            SizedBox(width: 10),
+                          ],
+                        ),
                         Spacer(),
                         // Fullscreen button
                         Row(
@@ -3717,10 +3644,7 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
                             ClipRRect(
                               borderRadius: BorderRadius.circular(20),
                               child: BackdropFilter(
-                                filter: ImageFilter.blur(
-                                  sigmaX: 4,
-                                  sigmaY: 4,
-                                ),
+                                filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
                                 child: Container(
                                   width: 50,
                                   height: 50,
@@ -3771,7 +3695,8 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
     final displayPosition = _isDragging
         ? Duration(
             milliseconds:
-                (_totalDuration.inMilliseconds * _dragProgress).round())
+                (_totalDuration.inMilliseconds * _dragProgress).round(),
+          )
         : _currentPosition;
 
     final screenWidth = MediaQuery.of(context).size.width;
@@ -3820,14 +3745,10 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
                       SizedBox(width: isFullScreenMode ? 50 : 20),
 
                       // Back button
-                      Row(children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(
-                              sigmaX: 4,
-                              sigmaY: 4,
-                            ),
+                      Row(
+                        children: [
+                          BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
                             child: GestureDetector(
                               onTap: () async {
                                 await HapticFeedback.lightImpact();
@@ -3844,19 +3765,17 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
                                     width: 1,
                                   ),
                                 ),
-                                alignment:
-                                    Alignment.center, // <— keeps icon centered
                                 child: Icon(
-                                  Icons.arrow_back_ios,
+                                  Icons.chevron_left_rounded,
                                   color: Colors.white,
-                                  size: 20,
+                                  size: 30,
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        SizedBox(width: 10),
-                      ]),
+                          SizedBox(width: 10),
+                        ],
+                      ),
 
                       // Quality selector in center
                       Expanded(
@@ -3878,10 +3797,7 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
                             ClipRRect(
                               borderRadius: BorderRadius.circular(20),
                               child: BackdropFilter(
-                                filter: ImageFilter.blur(
-                                  sigmaX: 4,
-                                  sigmaY: 4,
-                                ),
+                                filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
                                 child: Container(
                                   width: 50,
                                   height: 50,
@@ -3915,10 +3831,7 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
                           ClipRRect(
                             borderRadius: BorderRadius.circular(20),
                             child: BackdropFilter(
-                              filter: ImageFilter.blur(
-                                sigmaX: 4,
-                                sigmaY: 4,
-                              ),
+                              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
                               child: Container(
                                 width: 50,
                                 height: 50,
@@ -3965,9 +3878,7 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
                   right: 0,
                   child: Container(
                     height: 50,
-                    child: Center(
-                      child: _buildPortraitTopButtons(),
-                    ),
+                    child: Center(child: _buildPortraitTopButtons()),
                   ),
                 ),
 
@@ -4048,14 +3959,19 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
                               if (widget.hasMultipleEpisodes &&
                                   isFullScreenMode)
                                 Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0, 0, 40, 0),
-                                    child: AnimatedMoreVideosCard(
-                                      onTap: widget.onShowMoreVideos,
-                                      moreText: moreText,
-                                      videoText: videoText,
-                                      coverImage: _buildNextEpisodeCover(),
-                                    ))
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                    0,
+                                    0,
+                                    40,
+                                    0,
+                                  ),
+                                  child: AnimatedMoreVideosCard(
+                                    onTap: widget.onShowMoreVideos,
+                                    moreText: moreText,
+                                    videoText: videoText,
+                                    coverImage: _buildNextEpisodeCover(),
+                                  ),
+                                ),
                             ],
                           ),
                         ),
@@ -4066,8 +3982,12 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
                         Container(
                           height: 90,
                           child: Padding(
-                            padding:
-                                EdgeInsetsDirectional.fromSTEB(16, 8, 16, 8),
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                              16,
+                              8,
+                              16,
+                              8,
+                            ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
@@ -4085,7 +4005,8 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
                       // Progress slider
                       Padding(
                         padding: EdgeInsets.symmetric(
-                            horizontal: isFullScreenMode ? 40 : 8),
+                          horizontal: isFullScreenMode ? 40 : 8,
+                        ),
                         child: AnimatedBuilder(
                           animation: _sliderHeightAnimation,
                           builder: (context, child) {
@@ -4098,8 +4019,9 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
                                 overlayShape: RoundSliderOverlayShape(
                                   overlayRadius: _isDragging ? 16 : 12,
                                 ),
-                                activeTrackColor:
-                                    FlutterFlowTheme.of(context).primary,
+                                activeTrackColor: FlutterFlowTheme.of(
+                                  context,
+                                ).primary,
                                 inactiveTrackColor: Colors.white38,
                                 thumbColor: Colors.white,
                                 overlayColor: Colors.white.withOpacity(0.2),
@@ -4118,8 +4040,9 @@ class _CustomDownloadControlsState extends State<CustomDownloadControls>
                       // Video info and time
                       Padding(
                         padding: EdgeInsets.symmetric(
-                            horizontal: isFullScreenMode ? 50 : 18,
-                            vertical: 8),
+                          horizontal: isFullScreenMode ? 50 : 18,
+                          vertical: 8,
+                        ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -4368,7 +4291,8 @@ class _VideoPlayerState extends State<VideoPlayer> {
               continueEpisode.continueWatching?.inMinutes ?? 0;
 
           print(
-              '   Found in continue: season=$continueSeasonIndex, episode=$continueEpisodeIndex, episodeId=$continueEpisodeId, progress=${progressSeconds}s');
+            '   Found in continue: season=$continueSeasonIndex, episode=$continueEpisodeIndex, episodeId=$continueEpisodeId, progress=${progressSeconds}s',
+          );
 
           if (continueSeasonIndex < _cinemaData!.data.episodes.length) {
             final seasonEpisodes =
@@ -4379,7 +4303,8 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
               if (apiEpisode.episodeId == continueEpisodeId) {
                 print(
-                    '✅ EPISODE MATCH CONFIRMED: Loading season $continueSeasonIndex, episode $continueEpisodeIndex');
+                  '✅ EPISODE MATCH CONFIRMED: Loading season $continueSeasonIndex, episode $continueEpisodeIndex',
+                );
 
                 setState(() {
                   _currentSeasonIndex = continueSeasonIndex;
@@ -4392,11 +4317,13 @@ class _VideoPlayerState extends State<VideoPlayer> {
                 return true;
               } else {
                 print(
-                    '❌ EpisodeId mismatch: continue=${continueEpisodeId}, api=${apiEpisode.episodeId}');
+                  '❌ EpisodeId mismatch: continue=${continueEpisodeId}, api=${apiEpisode.episodeId}',
+                );
               }
             } else {
               print(
-                  '❌ Episode index $continueEpisodeIndex not found in season $continueSeasonIndex');
+                '❌ Episode index $continueEpisodeIndex not found in season $continueSeasonIndex',
+              );
             }
           } else {
             print('❌ Season index $continueSeasonIndex not found');
@@ -4405,7 +4332,8 @@ class _VideoPlayerState extends State<VideoPlayer> {
       }
 
       print(
-          '❌ No valid continue watching found, starting from season 0, episode 0');
+        '❌ No valid continue watching found, starting from season 0, episode 0',
+      );
       return false;
     } catch (e) {
       print('Error loading episode from continue watching: $e');
@@ -4632,7 +4560,8 @@ class _VideoPlayerState extends State<VideoPlayer> {
     final adUrl = availableAds[adIndex];
 
     print(
-        '✅✅ Showing ad $adIndex (interval $_nextAdIntervalIndex) for episode $_currentEpisodeIndex');
+      '✅✅ Showing ad $adIndex (interval $_nextAdIntervalIndex) for episode $_currentEpisodeIndex',
+    );
     print('📺 Ad URL: $adUrl');
     print('🎬 Episode adStatus: ${currentEpisode.adstatus}');
 
@@ -4659,8 +4588,10 @@ class _VideoPlayerState extends State<VideoPlayer> {
         break;
 
       case "subscribe":
-        widget.customCallBack
-            ?.call({"action": "subscribeButton", "data": widget.movieId});
+        widget.customCallBack?.call({
+          "action": "subscribeButton",
+          "data": widget.movieId,
+        });
         break;
 
       case "skipAd":
@@ -4748,8 +4679,10 @@ class _VideoPlayerState extends State<VideoPlayer> {
   }
 
   void _handleSubscribe() {
-    widget.customCallBack
-        ?.call({"action": "subscribeButton", "data": widget.movieId});
+    widget.customCallBack?.call({
+      "action": "subscribeButton",
+      "data": widget.movieId,
+    });
   }
 
   // AUTO-NEXT EPISODE METHODS
@@ -4842,7 +4775,8 @@ class _VideoPlayerState extends State<VideoPlayer> {
       if (currentPosition < endTimePosition && _showNextEpisodeCountdown) {
         _cancelNextEpisodeCountdown();
         print(
-            '⏪ Cancelled next episode countdown - before endTime ${endTimeSeconds}s');
+          '⏪ Cancelled next episode countdown - before endTime ${endTimeSeconds}s',
+        );
       }
     }
   }
@@ -4856,8 +4790,9 @@ class _VideoPlayerState extends State<VideoPlayer> {
       _isNextEpisodeTriggered = true;
     });
 
-    _nextEpisodeCountdownTimer =
-        Timer.periodic(const Duration(seconds: 1), (timer) {
+    _nextEpisodeCountdownTimer = Timer.periodic(const Duration(seconds: 1), (
+      timer,
+    ) {
       if (!mounted) {
         timer.cancel();
         return;
@@ -4900,7 +4835,9 @@ class _VideoPlayerState extends State<VideoPlayer> {
   }
 
   void _checkSeekBackIntoAdRegions(
-      double progressPercentage, String episodeKey) {
+    double progressPercentage,
+    String episodeKey,
+  ) {
     for (int i = 0; i < 3; i++) {
       final adRegionStart = _adIntervals[i];
       final adRegionEnd = i == 2 ? 100 : _adIntervals[i] + 29;
@@ -4997,7 +4934,9 @@ class _VideoPlayerState extends State<VideoPlayer> {
   }
 
   void _checkAndRemoveFromContinueWatching(
-      ApiEpisodeData currentEpisode, double progressPercentage) {
+    ApiEpisodeData currentEpisode,
+    double progressPercentage,
+  ) {
     try {
       if (!_cinemaData!.isSeason && progressPercentage >= 80) {
         _removeFromContinueWatching();
@@ -5036,8 +4975,9 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
   void _moveMovieToTopInContinueWatching() {
     try {
-      final continueWatchingList =
-          List<EpisodesStruct>.from(FFAppState().continueWatchingMovies);
+      final continueWatchingList = List<EpisodesStruct>.from(
+        FFAppState().continueWatchingMovies,
+      );
 
       int foundIndex = -1;
       for (int i = 0; i < continueWatchingList.length; i++) {
@@ -5056,7 +4996,8 @@ class _VideoPlayerState extends State<VideoPlayer> {
         });
 
         print(
-            '⬆️ Moved movie ${widget.movieId} from index $foundIndex to index 0');
+          '⬆️ Moved movie ${widget.movieId} from index $foundIndex to index 0',
+        );
       }
     } catch (e) {
       print('Error moving movie to top: $e');
@@ -5065,29 +5006,36 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
   void _removeFromContinueWatching() {
     try {
-      final continueWatchingList =
-          List<EpisodesStruct>.from(FFAppState().continueWatchingMovies);
+      final continueWatchingList = List<EpisodesStruct>.from(
+        FFAppState().continueWatchingMovies,
+      );
       final initialCount = continueWatchingList.length;
 
-      continueWatchingList
-          .removeWhere((episode) => episode.movieId == widget.movieId);
+      continueWatchingList.removeWhere(
+        (episode) => episode.movieId == widget.movieId,
+      );
 
       FFAppState().update(() {
         FFAppState().continueWatchingMovies = continueWatchingList;
       });
 
       print(
-          '🗑️ Removed movie ${widget.movieId} from continue watching (removed ${initialCount - continueWatchingList.length} entries)');
+        '🗑️ Removed movie ${widget.movieId} from continue watching (removed ${initialCount - continueWatchingList.length} entries)',
+      );
     } catch (e) {
       print('Error removing from continue watching: $e');
     }
   }
 
   void _saveProgressToContinueWatching(
-      ApiEpisodeData currentEpisode, int seconds, int percentage) {
+    ApiEpisodeData currentEpisode,
+    int seconds,
+    int percentage,
+  ) {
     try {
-      final continueWatchingList =
-          List<EpisodesStruct>.from(FFAppState().continueWatchingMovies);
+      final continueWatchingList = List<EpisodesStruct>.from(
+        FFAppState().continueWatchingMovies,
+      );
 
       // Convert ApiEpisodeData to EpisodesStruct with updated progress
       final episodeToSave = currentEpisode.toEpisodesStruct();
@@ -5122,8 +5070,9 @@ class _VideoPlayerState extends State<VideoPlayer> {
       );
 
       // Remove any existing entry for this movie
-      continueWatchingList
-          .removeWhere((episode) => episode.movieId == widget.movieId);
+      continueWatchingList.removeWhere(
+        (episode) => episode.movieId == widget.movieId,
+      );
 
       // Insert at the beginning
       continueWatchingList.insert(0, updatedEpisode);
@@ -5138,9 +5087,11 @@ class _VideoPlayerState extends State<VideoPlayer> {
       });
 
       print(
-          '💾 Progress saved: ${currentEpisode.title} - $seconds seconds ($percentage%) - Added to index 0');
+        '💾 Progress saved: ${currentEpisode.title} - $seconds seconds ($percentage%) - Added to index 0',
+      );
       print(
-          '📊 Continue watching list now has ${continueWatchingList.length} items');
+        '📊 Continue watching list now has ${continueWatchingList.length} items',
+      );
     } catch (e) {
       print('Error saving progress: $e');
     }
@@ -5184,7 +5135,10 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
     if (shouldSave) {
       _saveProgressToContinueWatching(
-          currentEpisode, currentPosition.inSeconds, percentageInt);
+        currentEpisode,
+        currentPosition.inSeconds,
+        percentageInt,
+      );
 
       _progressSaveTimer?.cancel();
       _progressSaveTimer = Timer(Duration(seconds: 5), () {});
@@ -5224,8 +5178,10 @@ class _VideoPlayerState extends State<VideoPlayer> {
   }
 
   Future<void> _setPortraitMode() async {
-    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-        overlays: SystemUiOverlay.values);
+    await SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: SystemUiOverlay.values,
+    );
     await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   }
 
@@ -5282,19 +5238,6 @@ class _VideoPlayerState extends State<VideoPlayer> {
     }
   }
 
-  /// Plays the next episode in the series or movie sequence
-  /// 
-  /// This method handles:
-  /// - Advancing to the next episode in the current season if available
-  /// - Advancing to the next season if all episodes in current season are played
-  /// - Going back to previous screen if no more episodes are available
-  /// - Canceling ad timers when transitioning between episodes
-  /// - Re-initializing the player with the new episode
-  /// 
-  /// The method follows this logic:
-  /// 1. If there's a next episode in the current season, play it
-  /// 2. If there's a next season and we're at the end of current season, switch to next season
-  /// 3. If no more episodes or seasons, handle back button action (return to previous screen)
   Future<void> _playNextEpisode() async {
     if (_currentEpisodeIndex < _currentEpisodes.length - 1) {
       setState(() {
@@ -5475,20 +5418,6 @@ class _VideoPlayerState extends State<VideoPlayer> {
     }
   }
 
-  /// Fetches cinema data from the API for the given movie ID
-  /// 
-  /// This method handles:
-  /// - Setting loading states in the UI
-  /// - Making an HTTP request to fetch cinema data with retry logic
-  /// - Parsing the JSON response into a CinemaDataResponse object
-  /// - Updating the current episodes list
-  /// - Initializing the player if episodes are available
-  /// - Error handling for network issues or invalid responses
-  /// 
-  /// Parameters:
-  /// - Makes a POST request to https://api.rebamovie.com/cinemaData
-  /// - Includes MovieId, userId, and deviceType in the request body
-  /// - Uses retry mechanism with 4 attempts and 1 second delay
   Future<void> _fetchCinemaData() async {
     setState(() {
       _isDataLoading = true;
@@ -5502,13 +5431,13 @@ class _VideoPlayerState extends State<VideoPlayer> {
           "method": "POST",
           "headers": {
             "Content-Type": "application/json",
-            "Content-Language": "1.0.1"
+            "Content-Language": "1.0.1",
           },
           "body": json.encode({
             "MovieId": widget.movieId,
             "userId": widget.userId,
-            "deviceType": "IOS"
-          })
+            "deviceType": "IOS",
+          }),
         },
         4,
         1000,
@@ -5595,17 +5524,6 @@ class _VideoPlayerState extends State<VideoPlayer> {
     }
   }
 
-  /// Initializes the video player with the current episode
-  /// 
-  /// This method handles:
-  /// - Setting up loading states and UI indicators
-  /// - Loading episodes from continue watching data if available
-  /// - Creating and initializing the video player controller
-  /// - Setting up the Chewie player UI
-  /// - Managing resume positions from previous viewing sessions
-  /// 
-  /// It properly disposes of existing controllers before creating new ones
-  /// and handles error states appropriately.
   Future<void> _initializePlayer() async {
     if (_currentEpisodes.isEmpty) return;
 
@@ -5667,12 +5585,14 @@ class _VideoPlayerState extends State<VideoPlayer> {
       await _videoPlayerController!.initialize();
       _videoPlayerController!.addListener(_videoListener);
 
-      final continueWatchingPosition =
-          _getContinueWatchingPosition(currentEpisode);
+      final continueWatchingPosition = _getContinueWatchingPosition(
+        currentEpisode,
+      );
 
       print('🎬 LOADING EPISODE:');
       print(
-          '   Season: ${_currentSeasonIndex}, Episode: ${_currentEpisodeIndex}');
+        '   Season: ${_currentSeasonIndex}, Episode: ${_currentEpisodeIndex}',
+      );
       print('   EpisodeId: ${currentEpisode.episodeId}');
       print('   Continue position: ${continueWatchingPosition.inSeconds}s');
       print('   Is initial load: $_isInitialLoad');
@@ -5680,7 +5600,8 @@ class _VideoPlayerState extends State<VideoPlayer> {
       if (_isInitialLoad && continueWatchingPosition > Duration.zero) {
         await _videoPlayerController!.seekTo(continueWatchingPosition);
         print(
-            '▶️ RESUMED from continue watching at ${continueWatchingPosition.inSeconds} seconds');
+          '▶️ RESUMED from continue watching at ${continueWatchingPosition.inSeconds} seconds',
+        );
       } else if (_isInitialLoad) {
         print('🔄 STARTING from beginning (no continue watching data)');
       } else {
@@ -5752,7 +5673,8 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
       for (final continueEpisode in continueWatchingList) {
         print(
-            '   Checking: movieId=${continueEpisode.movieId}, episodeId=${continueEpisode.episodeId}, progress=${continueEpisode.continueWatching?.inMinutes}s');
+          '   Checking: movieId=${continueEpisode.movieId}, episodeId=${continueEpisode.episodeId}, progress=${continueEpisode.continueWatching?.inMinutes}s',
+        );
 
         if (continueEpisode.movieId == widget.movieId &&
             continueEpisode.episodeId == currentEpisode.episodeId) {
@@ -5830,8 +5752,10 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
         double targetOffset =
             scrollPosition - (viewportWidth / 2) + (episodeWidth / 2);
-        targetOffset =
-            targetOffset.clamp(0.0, _scrollController.position.maxScrollExtent);
+        targetOffset = targetOffset.clamp(
+          0.0,
+          _scrollController.position.maxScrollExtent,
+        );
 
         _scrollController.animateTo(
           targetOffset,
@@ -5908,26 +5832,16 @@ class _VideoPlayerState extends State<VideoPlayer> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: 4,
-            sigmaY: 4,
-          ),
+          filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
           child: Container(
             width: 40,
             height: 40,
             decoration: BoxDecoration(
               color: Color(0x32818181),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: Color(0x40E0E3E7),
-                width: 1,
-              ),
+              border: Border.all(color: Color(0x40E0E3E7), width: 1),
             ),
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: 20,
-            ),
+            child: Icon(icon, color: Colors.white, size: 20),
           ),
         ),
       ),
@@ -6012,30 +5926,48 @@ class _VideoPlayerState extends State<VideoPlayer> {
           ),
           if (_currentEpisodes.length > 1)
             Positioned(
-              left: 8,
+              left: 0,
               top: 0,
               bottom: 0,
-              child: Center(
-                child: SizedBox(
-                  height: 50,
-                  child: _buildNavigationButton(
-                    icon: Icons.arrow_back_ios,
-                    onTap: _scrollLeft,
+              child: SafeArea(
+                top: false,
+                bottom: false,
+                right: false,
+                left: true,
+                child: Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(8, 0, 0, 0),
+                  child: Center(
+                    child: SizedBox(
+                      height: 50,
+                      child: _buildNavigationButton(
+                        icon: Icons.arrow_back_ios,
+                        onTap: _scrollLeft,
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
           if (_currentEpisodes.length > 1)
             Positioned(
-              right: 8,
+              right: 0,
               top: 0,
               bottom: 0,
-              child: Center(
-                child: SizedBox(
-                  height: 50,
-                  child: _buildNavigationButton(
-                    icon: Icons.arrow_forward_ios,
-                    onTap: _scrollRight,
+              child: SafeArea(
+                top: false,
+                bottom: false,
+                left: false,
+                right: true,
+                child: Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(0, 0, 8, 0),
+                  child: Center(
+                    child: SizedBox(
+                      height: 50,
+                      child: _buildNavigationButton(
+                        icon: Icons.arrow_forward_ios,
+                        onTap: _scrollRight,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -6063,30 +5995,48 @@ class _VideoPlayerState extends State<VideoPlayer> {
           ),
           if (_cinemaData!.data.seasons.length > 1)
             Positioned(
-              left: 8,
+              left: 0,
               top: 0,
               bottom: 0,
-              child: Center(
-                child: SizedBox(
-                  height: 50,
-                  child: _buildNavigationButton(
-                    icon: Icons.arrow_back_ios,
-                    onTap: _scrollSeasonsLeft,
+              child: SafeArea(
+                top: false,
+                bottom: false,
+                right: false,
+                left: true,
+                child: Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(8, 0, 0, 0),
+                  child: Center(
+                    child: SizedBox(
+                      height: 50,
+                      child: _buildNavigationButton(
+                        icon: Icons.arrow_back_ios,
+                        onTap: _scrollSeasonsLeft,
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
           if (_cinemaData!.data.seasons.length > 1)
             Positioned(
-              right: 8,
+              right: 0,
               top: 0,
               bottom: 0,
-              child: Center(
-                child: SizedBox(
-                  height: 50,
-                  child: _buildNavigationButton(
-                    icon: Icons.arrow_forward_ios,
-                    onTap: _scrollSeasonsRight,
+              child: SafeArea(
+                top: false,
+                bottom: false,
+                left: false,
+                right: true,
+                child: Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(0, 0, 8, 0),
+                  child: Center(
+                    child: SizedBox(
+                      height: 50,
+                      child: _buildNavigationButton(
+                        icon: Icons.arrow_forward_ios,
+                        onTap: _scrollSeasonsRight,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -6179,17 +6129,12 @@ class _VideoPlayerState extends State<VideoPlayer> {
         color: Colors.grey[800],
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Icon(
-        Icons.movie,
-        color: Colors.grey[600],
-        size: 40,
-      ),
+      child: Icon(Icons.movie, color: Colors.grey[600], size: 40),
     );
   }
 
   Widget _buildMoreVideosBottomSheet([StateSetter? setModalState]) {
     final isMovie = !_cinemaData!.isSeason;
-
     return Container(
       height: 500,
       decoration: BoxDecoration(
@@ -6228,24 +6173,28 @@ class _VideoPlayerState extends State<VideoPlayer> {
                       'More Movies',
                       style:
                           FlutterFlowTheme.of(context).headlineMedium.override(
-                                fontFamily: FlutterFlowTheme.of(context)
-                                    .headlineMediumFamily,
+                                fontFamily: FlutterFlowTheme.of(
+                                  context,
+                                ).headlineMediumFamily,
                                 color: Colors.white,
                                 fontSize: 22,
                                 letterSpacing: 0.0,
-                                useGoogleFonts: !FlutterFlowTheme.of(context)
-                                    .headlineMediumIsCustom,
+                                useGoogleFonts: !FlutterFlowTheme.of(
+                                  context,
+                                ).headlineMediumIsCustom,
                               ),
                     ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.close,
-                      color: Colors.white,
-                      size: 24,
+                  SafeArea(
+                    top: false,
+                    bottom: false,
+                    left: true,
+                    right: false,
+                    child: IconButton(
+                      icon: Icon(Icons.close, color: Colors.white, size: 24),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
                     ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
                   ),
                 ],
               ),
@@ -6272,90 +6221,91 @@ class _VideoPlayerState extends State<VideoPlayer> {
     final isOnSeasonsPage = _bottomSheetPageController.hasClients &&
         _bottomSheetPageController.page?.round() == 1;
 
-    return GestureDetector(
-      onTap: () async {
-        if (_isSeasonButtonAnimating) return;
-
-        final updateState = setModalState ?? setState;
-
-        updateState(() {
-          _isSeasonButtonAnimating = true;
-          _seasonButtonScale = 0.85;
-        });
-
-        await HapticFeedback.lightImpact();
-
-        if (isOnSeasonsPage) {
-          _bottomSheetPageController.animateToPage(
-            0,
-            duration: Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-          );
-        } else {
-          _bottomSheetPageController.animateToPage(
-            1,
-            duration: Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-          );
-        }
-
-        Future.delayed(Duration(milliseconds: 200), () {
-          if (mounted) {
-            updateState(() {
-              _seasonButtonScale = 1.0;
-            });
+    return SafeArea(
+      top: false,
+      bottom: false,
+      left: true,
+      right: false,
+      child: GestureDetector(
+        onTap: () async {
+          if (_isSeasonButtonAnimating) return;
+          final updateState = setModalState ?? setState;
+          updateState(() {
+            _isSeasonButtonAnimating = true;
+            _seasonButtonScale = 0.85;
+          });
+          await HapticFeedback.lightImpact();
+          if (isOnSeasonsPage) {
+            _bottomSheetPageController.animateToPage(
+              0,
+              duration: Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
+            );
+          } else {
+            _bottomSheetPageController.animateToPage(
+              1,
+              duration: Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
+            );
           }
-        });
-
-        Future.delayed(Duration(milliseconds: 700), () {
-          if (mounted) {
-            updateState(() {
-              _isSeasonButtonAnimating = false;
-            });
-          }
-        });
-      },
-      child: AnimatedScale(
-        scale: _seasonButtonScale,
-        duration: Duration(milliseconds: 200),
-        child: Container(
-          width: 200,
-          height: 50,
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.6),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.3),
-              width: 1,
+          Future.delayed(Duration(milliseconds: 200), () {
+            if (mounted) {
+              updateState(() {
+                _seasonButtonScale = 1.0;
+              });
+            }
+          });
+          Future.delayed(Duration(milliseconds: 700), () {
+            if (mounted) {
+              updateState(() {
+                _isSeasonButtonAnimating = false;
+              });
+            }
+          });
+        },
+        child: AnimatedScale(
+          scale: _seasonButtonScale,
+          duration: Duration(milliseconds: 200),
+          child: Container(
+            width: 200,
+            height: 50,
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.6),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.3),
+                width: 1,
+              ),
             ),
-          ),
-          child: Padding(
-            padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 0),
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  isOnSeasonsPage ? "Back to Episodes" : currentSeason,
-                  style: FlutterFlowTheme.of(context).titleSmall.override(
-                        fontFamily:
-                            FlutterFlowTheme.of(context).titleSmallFamily,
-                        color: Colors.white,
-                        fontSize: 14,
-                        letterSpacing: 0.0,
-                        fontWeight: FontWeight.w500,
-                        useGoogleFonts:
-                            !FlutterFlowTheme.of(context).titleSmallIsCustom,
-                      ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Icon(
-                  isOnSeasonsPage ? Icons.arrow_upward : Icons.arrow_downward,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ],
+            child: Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 0),
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    isOnSeasonsPage ? "Back to Episodes" : currentSeason,
+                    style: FlutterFlowTheme.of(context).titleSmall.override(
+                          fontFamily:
+                              FlutterFlowTheme.of(context).titleSmallFamily,
+                          color: Colors.white,
+                          fontSize: 14,
+                          letterSpacing: 0.0,
+                          fontWeight: FontWeight.w500,
+                          useGoogleFonts: !FlutterFlowTheme.of(
+                            context,
+                          ).titleSmallIsCustom,
+                        ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Icon(
+                    isOnSeasonsPage ? Icons.arrow_upward : Icons.arrow_downward,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -6392,10 +6342,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
             children: [
               CircularProgressIndicator(color: Colors.white),
               SizedBox(height: 16),
-              Text(
-                'Preparing ad...',
-                style: TextStyle(color: Colors.white),
-              ),
+              Text('Preparing ad...', style: TextStyle(color: Colors.white)),
             ],
           ),
         ),
@@ -6413,10 +6360,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
             children: [
               CircularProgressIndicator(color: Colors.white),
               SizedBox(height: 16),
-              Text(
-                'Loading content...',
-                style: TextStyle(color: Colors.white),
-              ),
+              Text('Loading ...', style: TextStyle(color: Colors.white)),
             ],
           ),
         ),
@@ -6471,10 +6415,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
             children: [
               CircularProgressIndicator(color: Colors.white),
               SizedBox(height: 16),
-              Text(
-                'Loading video...',
-                style: TextStyle(color: Colors.white),
-              ),
+              Text('Loading ...', style: TextStyle(color: Colors.white)),
             ],
           ),
         ),
@@ -6499,9 +6440,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
             width: widget.width,
             height: widget.height,
             color: Colors.black,
-            child: Chewie(
-              controller: _chewieController!,
-            ),
+            child: Chewie(controller: _chewieController!),
           ),
           if (_videoPlayerController != null &&
               _videoPlayerController!.value.isInitialized &&
@@ -6528,9 +6467,9 @@ class _VideoPlayerState extends State<VideoPlayer> {
                         currentPosition + Duration(seconds: skipTime);
                     final totalDuration =
                         _videoPlayerController!.value.duration;
-                    _videoPlayerController!.seekTo(newPosition < totalDuration
-                        ? newPosition
-                        : totalDuration);
+                    _videoPlayerController!.seekTo(
+                      newPosition < totalDuration ? newPosition : totalDuration,
+                    );
                   }
                 },
                 onToggleMute: _toggleMute,
@@ -6555,8 +6494,10 @@ class _VideoPlayerState extends State<VideoPlayer> {
                 isEpisodeLocked: isEpisodeLocked,
                 // Add subscribe callback
                 onSubscribe: () {
-                  widget.customCallBack?.call(
-                      {"action": "subscribeButton", "data": widget.movieId});
+                  widget.customCallBack?.call({
+                    "action": "subscribeButton",
+                    "data": widget.movieId,
+                  });
                 },
               ),
             ),
